@@ -168,6 +168,7 @@ body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:non
 .viz .g12{gap:6px 10px;width:200px}
 .viz .g200{grid-template-columns:repeat(20,1fr);gap:3px}
 .viz .g200 i.on{box-shadow:0 0 0 3px color-mix(in srgb,var(--tx) 22%,transparent)}
+.viz .crowd circle{fill:color-mix(in srgb,var(--tx) 16%,transparent)}.viz .crowd circle.on{fill:var(--tx);stroke:color-mix(in srgb,var(--tx) 22%,transparent);stroke-width:3;paint-order:stroke}
 .viz .src{font-size:11px;color:var(--mu);opacity:.8}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,280px));gap:18px;justify-content:center;margin-top:20px;text-align:left}
 .card{background:color-mix(in srgb,var(--surf) 94%,transparent);border:1px solid var(--bd);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px}
@@ -290,9 +291,10 @@ document.getElementById('rods').innerHTML=Object.values(GROUPS).map(g=>{const x=
 
 // colour-off data viz
 const dots=(n,on,cls)=>`<div class="box"><div class="grid ${cls}" aria-hidden="true">${Array.from({length:n},(_,i)=>`<i class="${i<on?'on':''}"></i>`).join('')}</div></div>`;
+const crowd=()=>{let c='';for(let i=0;i<200;i++){const r=4.1*Math.sqrt(i+.5),a=i*2.39996;const x=60+r*Math.cos(a),y=60+r*Math.sin(a);c+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${i===0?3.6:2.4}" class="${i===0?'on':''}"/>`;}return `<div class="box"><svg class="crowd" viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">${c}</svg></div>`;};
 document.getElementById('viz').innerHTML=[
  ['1 in 12','men are colour blind worldwide',dots(12,1,'g12'),'Cleveland Clinic'],
- ['1 in 200','women are colour blind worldwide',dots(200,1,'g200'),'Cleveland Clinic'],
+ ['1 in 200','women are colour blind worldwide',crowd(),'Cleveland Clinic'],
  ['4 in 100','people in the world are colour blind, about 300 million in total',dots(100,4,'g100'),'Colour Blind Awareness']
 ].map(([b,c,g,src])=>`<figure>${g}<div class="big">${b}</div><figcaption>${c}<br><span class="src">Source: ${src}</span></figcaption></figure>`).join('');
 
