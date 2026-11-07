@@ -182,7 +182,7 @@ body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:non
 .fine{font-size:11px;color:var(--mu)}
 
 /* NARROW: stack the groups */
-@media (min-width:1001px){html,body{height:100%;overflow:hidden;overscroll-behavior:none}body.grey .hint{position:absolute;visibility:hidden}.greyview{min-height:0;height:calc(100dvh - 82px);padding-bottom:0;overflow:hidden}.greyview .glamp{margin-top:40px}.greyview .gcontent{margin-top:20px;gap:12px}.greyview .viz{margin-top:16px}.greyview .cta{margin-top:14px}body:not(.grey) .stage{--sh:max(560px,calc(100dvh - 150px));height:var(--sh)}}
+@media (min-width:1001px){html,body{height:100%;overflow:hidden;overscroll-behavior:none}body.grey .hint{position:absolute;visibility:hidden}.greyview{min-height:0;height:calc(100dvh - 82px);padding-bottom:0;overflow:hidden}.greyview .glamp{margin-top:28px}.greyview .gcontent{margin-top:4px;gap:12px}.greyview .viz{margin-top:16px}.greyview .cta{margin-top:14px}body:not(.grey) .stage{--sh:max(560px,calc(100dvh - 150px));height:var(--sh)}}
 @media (max-width:1000px){
   .stage{height:auto;margin-top:0;display:grid;gap:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
   .rail,.links,.legend{display:none!important}
@@ -233,7 +233,6 @@ body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:non
   <div class="gcone"></div>
   <div class="glamp"><div class="lamp"><span class="cap"></span><span class="shade"></span><span class="rim"></span><span class="lens"></span></div></div>
   <div class="gcontent">
-    <span class="eyebrow">THE MAIN SWITCH IS OFF</span>
     <h1>This is what colour blindness can feel like.</h1>
     <p class="lead">Colour blindness is more common than most people think. Each dot below is one person. Turn the colour back on to see who can help.</p>
     <div class="viz" id="viz"></div>
