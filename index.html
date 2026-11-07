@@ -63,7 +63,7 @@ body.grey .seg,body.grey #connBtn{opacity:.4;pointer-events:none}
 .lamp .lens{position:absolute;left:14px;right:14px;bottom:-1px;height:9px;border-radius:50%;background:var(--lens-off);transition:background .3s,box-shadow .3s}
 .lamp .cap{position:absolute;left:50%;top:-8px;width:20px;height:10px;border-radius:3px;background:var(--h2);transform:translateX(-50%)}
 .group.on .lens{background:#fff;box-shadow:0 0 18px 6px #fff,0 0 40px 14px var(--c)}
-.cone{position:absolute;left:var(--x);top:calc(var(--top) + 50px);width:min(460px,34vw);height:calc(740px - var(--top) - 50px);transform:translateX(-50%);
+.cone{position:absolute;left:var(--x);top:calc(var(--top) + 50px);width:min(460px,34vw);height:calc(var(--sh,740px) - var(--top) - 50px);transform:translateX(-50%);
   background:linear-gradient(180deg,color-mix(in srgb,var(--c) calc(var(--cone)*100% + 18%),transparent),color-mix(in srgb,var(--c) calc(var(--cone)*35%),transparent) 70%,transparent);
   clip-path:polygon(41% 0,59% 0,100% 100%,0 100%);filter:blur(10px);opacity:0;transition:opacity .6s ease;z-index:1}
 .pool{position:absolute;left:var(--x);bottom:0;width:min(560px,42vw);height:70px;transform:translateX(-50%);border-radius:50%;background:var(--c);filter:blur(40px);opacity:0;transition:opacity .6s;z-index:1}
@@ -165,6 +165,7 @@ body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:non
 .fine{font-size:11px;color:var(--mu)}
 
 /* NARROW: stack the groups */
+@media (min-width:1001px){html:has(body:not(.grey)),body:not(.grey){height:100%;overflow:hidden;overscroll-behavior:none}body:not(.grey) .stage{--sh:max(560px,calc(100dvh - 150px));height:var(--sh)}}
 @media (max-width:1000px){
   .stage{height:auto;margin-top:0;display:grid;gap:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
   .rail,.links,.legend{display:none!important}
