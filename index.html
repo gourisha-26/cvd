@@ -1,0 +1,332 @@
+<meta charset="utf-8">
+<title>CVD Game Ecosystem</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one dark "stage" where three pendant lights each light up one stakeholder group; a main switch swaps the stage for a grey-light explainer. */
+:root{
+  --bg:#F4F2ED; --surf:#FFFFFF; --bd:#E3DED5; --tx:#15181D; --mu:#5E656E;
+  --rail:#CFC9BE; --h1:#F7F6F3; --h2:#B9B3A8; --lens-off:#D9D4CB; --chip:#EFECE6;
+  --cone:.30; --pool:.20; --grey:#8E939B;
+  --p:#FF3B30; --s:#22C55E; --t:#3B82F6; --switch:#F9C846;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#08090B; --surf:#121418; --bd:#25292F; --tx:#F4F4F5; --mu:#9AA0A6;
+  --rail:#1E2126; --h1:#4A505A; --h2:#16181C; --lens-off:#2A2D33; --chip:#2A2E35;
+  --cone:.62; --pool:.34; --grey:#D7DADF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#08090B; --surf:#121418; --bd:#25292F; --tx:#F4F4F5; --mu:#9AA0A6;
+  --rail:#1E2126; --h1:#4A505A; --h2:#16181C; --lens-off:#2A2D33; --chip:#2A2E35;
+  --cone:.62; --pool:.34; --grey:#D7DADF; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px;transition:background .4s,color .4s;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+button:focus-visible,.item:focus-visible{outline:2px solid var(--switch);outline-offset:2px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+
+/* NAV */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding-block:14px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));
+  background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.brand{display:flex;flex-direction:column;gap:2px;margin-right:auto}
+.brand b{font-size:18px;letter-spacing:-.01em}
+.brand span{font-size:12px;color:var(--mu);font-weight:500}
+.center{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:30px;background:var(--surf);border:1px solid var(--bd);font-weight:600;font-size:13px}
+.toggle{width:34px;height:20px;border-radius:10px;background:var(--switch);position:relative;transition:background .3s}
+.toggle::after{content:"";position:absolute;top:2px;left:16px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .3s}
+body.grey .toggle{background:var(--lens-off)} body.grey .toggle::after{left:2px}
+.seg{display:inline-flex;gap:4px;padding:4px;border-radius:30px;background:var(--surf);border:1px solid var(--bd);transition:opacity .3s}
+.seg button{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 12px;border-radius:24px;font-weight:600;font-size:13px;color:var(--mu)}
+.seg button.on{color:var(--tx)} .seg button.active{background:var(--chip)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:background .3s,box-shadow .3s}
+.seg button.on .dot{background:var(--c);box-shadow:0 0 8px var(--c)}
+body.grey .seg,body.grey #connBtn{opacity:.4;pointer-events:none}
+.right{display:flex;gap:8px}
+#connBtn[aria-pressed="true"]{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.icon{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* STAGE */
+.hint{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));padding-block:16px 0;color:var(--mu);font-size:12.5px;font-weight:500;max-width:760px;margin:0}
+.stage{position:relative;height:740px;margin-top:-30px}
+.rail{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.rail line{stroke:var(--rail);vector-effect:non-scaling-stroke}
+.group{--x:20%;--top:330px;position:absolute;inset:0;pointer-events:none}
+.lamp{position:absolute;left:var(--x);top:var(--top);width:156px;height:52px;transform:translateX(-50%);pointer-events:auto;cursor:pointer;border-radius:60px 60px 10px 10px;z-index:3}
+.lamp .shade{position:absolute;inset:0 0 10px;border-radius:78px 78px 4px 4px/52px 52px 4px 4px;background:linear-gradient(180deg,var(--h1),var(--h2));box-shadow:inset 18px -4px 30px rgba(255,255,255,.12)}
+.lamp .rim{position:absolute;left:-2px;right:-2px;bottom:4px;height:9px;border-radius:0 0 6px 6px;background:var(--h2)}
+.lamp .lens{position:absolute;left:14px;right:14px;bottom:-1px;height:9px;border-radius:50%;background:var(--lens-off);transition:background .3s,box-shadow .3s}
+.lamp .cap{position:absolute;left:50%;top:-8px;width:20px;height:10px;border-radius:3px;background:var(--h2);transform:translateX(-50%)}
+.group.on .lens{background:#fff;box-shadow:0 0 18px 6px #fff,0 0 40px 14px var(--c)}
+.cone{position:absolute;left:var(--x);top:calc(var(--top) + 50px);width:min(460px,34vw);height:calc(740px - var(--top) - 50px);transform:translateX(-50%);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--c) calc(var(--cone)*100% + 18%),transparent),color-mix(in srgb,var(--c) calc(var(--cone)*35%),transparent) 70%,transparent);
+  clip-path:polygon(41% 0,59% 0,100% 100%,0 100%);filter:blur(10px);opacity:0;transition:opacity .6s ease;z-index:1}
+.pool{position:absolute;left:var(--x);bottom:0;width:min(560px,42vw);height:70px;transform:translateX(-50%);border-radius:50%;background:var(--c);filter:blur(40px);opacity:0;transition:opacity .6s;z-index:1}
+.group.on .cone{opacity:1} .group.on .pool{opacity:var(--pool)}
+.col{position:absolute;left:calc(var(--x) - 100px);top:calc(var(--top) + 110px);width:240px;pointer-events:auto;z-index:4;transition:opacity .4s}
+.col .num{font-size:13px;font-weight:500;letter-spacing:.12em;opacity:.7}
+.col h2{margin:6px 0 0;font-size:20px;font-weight:600;letter-spacing:.14em;line-height:1.18;text-transform:uppercase}
+.col .bar{width:28px;height:2px;background:var(--c);margin:14px 0 16px}
+.col ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.col .foot{margin-top:18px;font-size:12px;color:var(--mu)}
+.group:not(.on) .col .num,.group:not(.on) .col h2,.group:not(.on) .col .foot{opacity:.25}
+.item{display:flex;align-items:center;gap:10px;width:100%;padding:2px 10px 2px 2px;border-radius:20px;text-align:left;font-weight:600;font-size:14px;transition:opacity .3s,background .2s,box-shadow .2s;position:relative}
+.item:hover{background:color-mix(in srgb,var(--tx) 8%,transparent)}
+.ic{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)}
+:root[data-theme="dark"] .ic{background:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ic{background:#fff}}
+.group:not(.on) .item{opacity:.28}
+.item.linked{opacity:1!important;box-shadow:inset 0 0 0 1px var(--c)}
+.item.sel{background:color-mix(in srgb,var(--tx) 10%,transparent);opacity:1!important}
+body.conn .item:not(.linked){opacity:.28}
+.badge{display:none;margin-left:auto;min-width:20px;height:18px;padding:0 6px;border-radius:9px;font-size:10px;font-weight:700;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c) 22%,transparent);color:var(--c)}
+body.conn .item.linked .badge{display:inline-flex}
+.group.T .badge{display:none!important}
+.links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;overflow:visible}
+
+.legend{position:absolute;left:max(24px,env(safe-area-inset-left,0px));top:60px;z-index:6;display:none;flex-direction:column;gap:8px;padding:14px 16px;border-radius:12px;background:var(--surf);border:1px solid var(--bd);font-size:12px;font-weight:500}
+body.conn .legend{display:flex}
+.legend small{font-size:10px;letter-spacing:.12em;font-weight:700;color:var(--mu)}
+.legend .row{display:flex;align-items:center;gap:8px}
+.legend i{display:inline-block;width:40px;height:2px;border-radius:2px;position:relative}
+.legend i::before,.legend i::after{content:"";position:absolute;top:-3px;width:8px;height:8px;border-radius:50%}
+.legend i::before{left:-2px;background:var(--a)} .legend i::after{right:-2px;background:var(--b)}
+.legend .note{color:var(--mu);font-size:11px}
+
+/* DRAWER */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);z-index:25;background:var(--surf);border-left:1px solid var(--bd);
+  padding:calc(24px + env(safe-area-inset-top,0px)) max(28px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) 28px;
+  overflow-y:auto;transform:translateX(100%);transition:transform .35s ease;display:flex;flex-direction:column;gap:22px}
+.drawer.open{transform:none}
+@media (min-width:1001px){.stage{transition:margin-right .35s ease,opacity .7s ease .35s,filter .9s ease .2s}body.drawer-open .stage{margin-right:420px}}
+.dtop{display:flex;justify-content:space-between;align-items:center}
+.tag{font-size:10.5px;font-weight:700;letter-spacing:.08em;padding:4px 10px;border-radius:20px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.who{display:flex;gap:14px;align-items:center}
+.who .ic{width:48px;height:48px;background:color-mix(in srgb,var(--c) 14%,transparent)!important}
+.who .ic svg{width:22px;height:22px}
+.who h3{margin:0;font-size:22px;letter-spacing:-.01em}
+.who p{margin:2px 0 0;color:var(--mu);font-size:12px;font-weight:500}
+.dsec h4{margin:0 0 8px;font-size:10.5px;letter-spacing:.1em;color:var(--mu)}
+.dsec p,.dsec li{margin:0;font-size:13.5px;line-height:1.55}
+.dsec ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 10px;border-radius:20px;border:1px solid var(--bd);font-size:12px;font-weight:600}
+.chips .dot{background:var(--c)}
+.quote{padding:16px;border-radius:12px;background:var(--chip);font-size:15px;font-weight:600;line-height:1.4}
+.quote span{display:block;margin-top:8px;font-size:11.5px;color:var(--mu);font-weight:500}
+.addmore{padding:16px;border-radius:12px;border:1.2px dashed var(--bd);color:var(--mu);font-size:12px;font-weight:500}
+
+/* GREY MODE */
+/* Both views share one grid cell so they can cross-fade */
+.scene{display:grid}
+.scene>.stage,.scene>.greyview{grid-area:1/1}
+.stage,.hint{transition:opacity .7s ease .35s,filter .9s ease .2s}
+.greyview{position:relative;min-height:860px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));padding-block:0 60px;text-align:center;
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .6s ease,visibility 0s linear .6s}
+body.grey .greyview{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .8s ease .7s,visibility 0s}
+body.grey .stage,body.grey .hint{opacity:0;filter:grayscale(1) brightness(.6);pointer-events:none;transition:opacity .6s ease .45s,filter .5s ease}
+/* lights switch off one after another, then the grey light warms up */
+body.grey .group .cone,body.grey .group .pool{opacity:0}
+body.grey .group.T .cone,body.grey .group.T .pool{transition-delay:0s}
+body.grey .group.S .cone,body.grey .group.S .pool{transition-delay:.12s}
+body.grey .group.P .cone,body.grey .group.P .pool{transition-delay:.24s}
+body.grey .group .lens{background:var(--lens-off);box-shadow:none}
+body.waking .group .cone,body.waking .group .pool{transition-delay:.5s}
+body.waking .group.S .cone,body.waking .group.S .pool{transition-delay:.62s}
+body.waking .group.P .cone,body.waking .group.P .pool{transition-delay:.74s}
+.greyview .gcone{transform:translateX(-50%) scaleY(0);transform-origin:top;opacity:0;transition:transform .9s cubic-bezier(.2,.7,.2,1) .8s,opacity .9s ease .8s}
+body.grey .greyview .gcone{transform:translateX(-50%) scaleY(1);opacity:1}
+.gcontent{transform:translateY(16px);transition:transform .8s ease .9s}
+body.grey .gcontent{transform:none}
+.greyview .glamp .lens{transition:box-shadow .5s ease .8s,background .5s ease .8s}
+body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:none}
+.greyview .glamp{position:relative;margin:70px auto 0;--c:var(--grey)}
+.greyview .glamp .lamp{position:relative;left:50%;top:0;cursor:default}
+.greyview .glamp .lens{background:#fff;box-shadow:0 0 18px 6px #fff,0 0 40px 14px var(--grey)}
+.greyview .gcone{position:absolute;left:50%;top:120px;width:min(1000px,96vw);height:820px;background:linear-gradient(180deg,color-mix(in srgb,var(--grey) 40%,transparent),transparent 85%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);filter:blur(12px);pointer-events:none}
+.gcontent{position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:40px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--mu)}
+.gcontent h1{margin:0;font-size:clamp(30px,4.2vw,46px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance;max-width:16ch}
+.gcontent .lead{margin:0;color:var(--mu);font-size:15px;line-height:1.55;max-width:60ch}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,280px));gap:18px;justify-content:center;margin-top:20px;text-align:left}
+.card{background:color-mix(in srgb,var(--surf) 94%,transparent);border:1px solid var(--bd);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.card h3{margin:0;font-size:20px}
+.card .d{font-size:13px;font-weight:500}
+.card .f{font-size:11.5px;color:var(--mu)}
+.card small{margin-top:14px;font-size:10px;letter-spacing:.1em;font-weight:700;color:var(--mu)}
+.sw{display:flex;gap:14px;margin-top:4px}
+.sw span{width:40px;height:40px;border-radius:50%}
+.cta{margin-top:26px;display:inline-flex;gap:8px;align-items:center;padding:12px 20px;border-radius:30px;background:var(--switch);color:#15181D;font-weight:700;font-size:14px}
+.fine{font-size:11px;color:var(--mu)}
+
+/* NARROW: stack the groups */
+@media (max-width:1000px){
+  .stage{height:auto;margin-top:0;display:grid;gap:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+  .rail,.links,.legend{display:none!important}
+  .group{position:relative;inset:auto;pointer-events:auto;padding:26px 20px 24px;border-radius:18px;border:1px solid var(--bd);overflow:hidden}
+  .group .lamp{position:absolute;left:auto;right:20px;top:14px;transform:scale(.55);transform-origin:top right}
+  .cone{left:auto;right:-20%;top:0;width:90%;height:100%;transform:none}
+  .pool{display:none}
+  .col{position:relative;left:auto;top:auto;width:auto}
+  .group.T{order:3}.group.S{order:2}.group.P{order:1}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nav{gap:10px}
+}
+@media (max-width:520px){.cards{grid-template-columns:1fr}.seg button{padding:7px 10px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="nav">
+  <div class="brand"><b>Color Vision Deficiency</b><span>Board &amp; card game ecosystem</span></div>
+  <div class="center">
+    <button class="pill" id="mainSwitch" aria-pressed="true"><span class="toggle"></span><span id="mainLabel">Colour on</span></button>
+    <div class="seg" role="group" aria-label="Lights">
+      <button data-f="all" style="--c:var(--tx)"><span class="dot"></span>All</button>
+      <button data-f="P" style="--c:var(--p)"><span class="dot"></span>Primary</button>
+      <button data-f="S" style="--c:var(--s)"><span class="dot"></span>Secondary</button>
+      <button data-f="T" style="--c:var(--t)"><span class="dot"></span>Tertiary</button>
+    </div>
+  </div>
+  <div class="right">
+    <button class="pill" id="connBtn" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Connections</button>
+    <button class="pill" id="themeBtn" aria-label="Switch light or dark mode"><svg class="icon" viewBox="0 0 24 24" id="themeIcon"></svg></button>
+  </div>
+</header>
+
+<p class="hint">Each light is one group of people. Click a light or a switch to focus, click any item to learn more, or switch the colour off to see what colour blindness is like.</p>
+
+<div class="scene">
+<main class="stage" id="stage">
+  <svg class="rail" viewBox="0 0 1000 740" preserveAspectRatio="none"><line x1="0" y1="190" x2="1000" y2="10" stroke-width="6" stroke-linecap="round"/><g id="rods"></g></svg>
+  <div class="legend"><small>HOW TO READ</small>
+    <div class="row"><i style="--a:var(--t);--b:var(--s);background:linear-gradient(90deg,var(--t),var(--s))"></i>Tertiary sets rules for Secondary</div>
+    <div class="row"><i style="--a:var(--s);--b:var(--p);background:linear-gradient(90deg,var(--s),var(--p))"></i>Secondary makes games for Primary</div>
+    <div class="note">Numbers show how many links an item has</div>
+  </div>
+  <svg class="links" id="links"></svg>
+</main>
+
+<section class="greyview" aria-label="Colour off">
+  <div class="gcone"></div>
+  <div class="glamp"><div class="lamp"><span class="cap"></span><span class="shade"></span><span class="rim"></span><span class="lens"></span></div></div>
+  <div class="gcontent">
+    <span class="eyebrow">THE MAIN SWITCH IS OFF</span>
+    <h1>This is what colour blindness can feel like.</h1>
+    <p class="lead">About 1 in 12 men and 1 in 200 women see colours differently. Here are the 4 main types. Turn the colour back on to see who can help.</p>
+    <div class="cards" id="cards"></div>
+    <button class="cta" id="ctaOn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>Turn the colour on</button>
+    <span class="fine">Colours are simulations for illustration.</span>
+  </div>
+</section>
+</div>
+
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+
+<script>
+const IC={user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v11h14V9"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/>',brief:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',grad:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>',pkg:'<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/>',dice:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2"/><circle cx="16" cy="16" r="1.2"/>',palette:'<circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16" cy="10" r="1"/>',bag:'<path d="M5 7h14l-1 14H6z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/>',eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',cup:'<path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/>',file:'<path d="M14 3H6v18h12V8z"/><path d="M14 3v5h5"/>',flask:'<path d="M10 3v6L4.5 19h15L14 9V3"/><path d="M9 3h6"/>',bank:'<path d="M3 21h18"/><path d="M3 10h18L12 3z"/><path d="M6 10v8M10 10v8M14 10v8M18 10v8"/>',phone:'<rect x="6" y="2" width="12" height="20" rx="2"/>',printer:'<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/>',x:'<path d="M6 6l12 12M18 6 6 18"/>',plus:'<path d="M12 5v14M5 12h14"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'};
+const svg=(k,cls='icon')=>`<svg class="${cls}" viewBox="0 0 24 24">${IC[k]}</svg>`;
+
+/* Data. Add more details to any item here later: who, faces, quote, more. */
+const GROUPS={
+ P:{n:'01',name:'Primary',title:'Primary ecosystem',c:'var(--p)',x:78,top:90,foot:'Direct interaction and everyday workarounds',items:[
+  {icon:'user',name:'Colour blind player',role:'Main user',who:'Plays board and card games with family and friends, but struggles when colour is the only clue.',faces:['Mixes up red-green and blue-purple pieces','Asks others for help to play','Avoids games like Ludo'],quote:['Board games like Ludo are hard to play.','According to the user interview insights']},
+  {icon:'home',name:'Family',role:'Plays at home',who:'Often the first people a colour blind child plays games with.',faces:['Help name colours during play','Often the first to notice colour problems']},
+  {icon:'users',name:'Friends',role:'Game groups',who:'Play together at home, in groups and at game nights.',faces:['Can help, or unknowingly leave the player out']},
+  {icon:'brief',name:'Peers and colleagues',role:'College and work',who:'College clubs and office game events.',faces:['Players may hide the problem to avoid embarrassment']}]},
+ S:{n:'02',name:'Secondary',title:'Secondary ecosystem',c:'var(--s)',x:49,top:150,foot:'Making and selling games',items:[
+  {icon:'pkg',name:'Game publishers',role:'Decide what gets made',who:'Decide which games are made, their budget, and their parts.',faces:['Decide whether accessibility is included at all']},
+  {icon:'dice',name:'Designers',role:'Design the game',who:'Design the rules, pieces and visual system of a game.',faces:['Choose if colour is the only way to tell things apart']},
+  {icon:'bag',name:'Retailers',role:'Sell games',who:'Sell games in shops and online stores.',faces:['Can label games as colour blind friendly']},
+  {icon:'eye',name:'Eye doctors',role:'Diagnose CVD',who:'Test and diagnose colour blindness.',faces:['Help players know their type of colour blindness']}]},
+ T:{n:'03',name:'Tertiary',title:'Tertiary ecosystem',c:'var(--t)',x:20,top:210,foot:'Policy and long-term change',items:[
+  {icon:'file',name:'Standards bodies',role:'Write guidelines',who:'Create accessibility guidelines such as WCAG.',faces:['No standard exists for board games yet']},
+  {icon:'phone',name:'Digital apps',role:'Online versions',who:'Online versions of board games, such as Ludo apps.',faces:['Can add colour blind modes easily']},
+  {icon:'printer',name:'Manufacturers',role:'Print and produce',who:'Print and produce game parts.',faces:['Printing quality affects how distinct colours look']}]}};
+/* Links between items (left group → right group). Adjacent groups only, plus one direct link for the player. */
+const LINKS=[['T0','S1'],['T1','S2'],['S1','P0'],['S3','P0'],['S2','P1']];
+const ADJ=LINKS.filter(([a,b])=>!(a[0]==='T'&&b[0]==='P'));
+const CVD=[['Protanopia','Red looks dark and muddy','Common',['#8A7E3C','#A39448','#3F5DB5','#E8D45E']],['Deuteranopia','Green and red look alike','The most common type',['#9C8A3E','#A08E46','#4060B8','#EBD660']],['Tritanopia','Blue and yellow get confused','Rare',['#E8434E','#3D9C9A','#2E7D86','#F2A3B0']],['Achromatopsia','No colour at all, only grey','Very rare',['#6B6B6B','#828282','#5A5A5A','#C4C4C4']]];
+const NORMAL=['#E53935','#2E9E4F','#1E63D6','#F7C325'];
+
+const stage=document.getElementById('stage'),linksSvg=document.getElementById('links'),drawer=document.getElementById('drawer');
+const state={on:new Set(['P','S','T']),conn:false,sel:null};
+const item=id=>GROUPS[id[0]].items[+id.slice(1)];
+const count={};ADJ.forEach(([a,b])=>{count[a]=(count[a]||0)+1;count[b]=(count[b]||0)+1;});
+
+// build groups
+['T','S','P'].forEach(k=>{const g=GROUPS[k];const el=document.createElement('div');el.className='group on '+k;el.dataset.g=k;
+ el.style.cssText=`--x:${g.x}%;--top:${g.top}px;--c:${g.c}`;
+ el.innerHTML=`<div class="pool"></div><div class="cone"></div>
+ <button class="lamp" aria-label="Turn ${g.name} light on or off"><span class="cap"></span><span class="shade"></span><span class="rim"></span><span class="lens"></span></button>
+ <div class="col"><div class="num">${g.n}</div><h2>${g.title.replace(' ','<br>')}</h2><div class="bar"></div>
+ <ul>${g.items.map((it,i)=>`<li><button class="item" data-id="${k}${i}"><span class="ic">${svg(it.icon)}</span>${it.name}<span class="badge">${count[k+i]||''}</span></button></li>`).join('')}</ul>
+ <div class="foot">${g.foot}</div></div>`;
+ stage.appendChild(el);
+ el.querySelector('.lamp').onclick=()=>{state.on.has(k)?state.on.delete(k):state.on.add(k);render();};});
+// rods from rail to lamps
+document.getElementById('rods').innerHTML=Object.values(GROUPS).map(g=>{const x=g.x*10,ry=190-180*g.x/100;return `<line x1="${x}" y1="${ry}" x2="${x}" y2="${g.top-8}" stroke-width="4"/>`}).join('');
+
+// CVD cards
+document.getElementById('cards').innerHTML=CVD.map(([n,d,f,sim])=>`<article class="card"><h3>${n}</h3><span class="d">${d}</span><span class="f">${f}</span>
+ <small>YOU SEE</small><div class="sw">${NORMAL.map(c=>`<span style="background:${c}"></span>`).join('')}</div>
+ <small>THEY MAY SEE</small><div class="sw">${sim.map(c=>`<span style="background:${c}"></span>`).join('')}</div></article>`).join('');
+
+function render(){
+ document.querySelectorAll('.group').forEach(el=>el.classList.toggle('on',state.on.has(el.dataset.g)));
+ document.querySelectorAll('.seg button').forEach(b=>{const f=b.dataset.f;const on=f==='all'?state.on.size===3:state.on.has(f);b.classList.toggle('on',on);b.classList.toggle('active',f==='all'?state.on.size===3:(state.on.size===1&&state.on.has(f)));});
+ document.body.classList.toggle('conn',state.conn);
+ document.getElementById('connBtn').setAttribute('aria-pressed',state.conn);
+ const shown=state.sel?LINKS.filter(l=>l.includes(state.sel)):state.conn?ADJ:[];
+ const linked=new Set();shown.forEach(([a,b])=>{linked.add(a);linked.add(b);});
+ document.querySelectorAll('.item').forEach(b=>{const id=b.dataset.id;b.classList.toggle('linked',linked.has(id)&&id!==state.sel);b.classList.toggle('sel',id===state.sel);});
+ drawLinks(shown);
+}
+function drawLinks(list){
+ if(!list.length||matchMedia('(max-width:1000px)').matches){linksSvg.innerHTML='';return;}
+ const sb=stage.getBoundingClientRect();const pt=(id,side)=>{const r=document.querySelector(`.item[data-id="${id}"]`).getBoundingClientRect();return [side==='r'?r.right-sb.left+6:r.left-sb.left-6,r.top-sb.top+r.height/2];};
+ const col=k=>getComputedStyle(document.documentElement).getPropertyValue({P:'--p',S:'--s',T:'--t'}[k]).trim();
+ let defs='',paths='';list.forEach(([a,b],i)=>{const [x1,y1]=pt(a,'r'),[x2,y2]=pt(b,'l');const mx=(x1+x2)/2;
+  defs+=`<linearGradient id="lg${i}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="0" x2="${x2}" y2="0"><stop offset="0" stop-color="${col(a[0])}"/><stop offset="1" stop-color="${col(b[0])}"/></linearGradient>`;
+  paths+=`<path d="M${x1} ${y1}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="url(#lg${i})" stroke-width="2" fill="none"/><circle cx="${x1}" cy="${y1}" r="4" fill="${col(a[0])}"/><circle cx="${x2}" cy="${y2}" r="4" fill="${col(b[0])}"/>`;});
+ linksSvg.innerHTML=`<defs>${defs}</defs>${paths}`;
+}
+function openItem(id){
+ state.sel=id;const it=item(id),g=GROUPS[id[0]];
+ const conns=[...new Set(LINKS.filter(l=>l.includes(id)).map(([a,b])=>a===id?b:a))];
+ drawer.style.setProperty('--c',g.c);
+ drawer.innerHTML=`<div class="dtop"><span class="tag">${g.n} · ${g.name.toUpperCase()}</span><button id="closeD" aria-label="Close">${svg('x')}</button></div>
+ <div class="who"><span class="ic" style="color:${g.c}">${svg(it.icon)}</span><div><h3>${it.name}</h3><p>${it.role}</p></div></div>
+ <div class="dsec"><h4>WHO THEY ARE</h4><p>${it.who}</p></div>
+ <div class="dsec"><h4>WHAT THEY DO OR FACE</h4><ul>${it.faces.map(f=>`<li>${f}</li>`).join('')}</ul></div>
+ ${conns.length?`<div class="dsec"><h4>CONNECTED TO</h4><div class="chips">${conns.map(c=>`<button data-go="${c}" style="--c:${GROUPS[c[0]].c}"><span class="dot"></span>${item(c).name}</button>`).join('')}</div></div>`:''}
+ ${it.quote?`<div class="dsec"><h4>FROM MY RESEARCH</h4><div class="quote">&ldquo;${it.quote[0]}&rdquo;<span>${it.quote[1]}</span></div></div>`:''}
+ <div class="addmore">+ More information about ${it.name.toLowerCase()} can be added here later</div>`;
+ drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');document.body.classList.add('drawer-open');setTimeout(render,380);
+ state.on.add(id[0]);
+ drawer.querySelector('#closeD').onclick=closeItem;
+ drawer.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>openItem(b.dataset.go));
+ render();
+}
+function closeItem(){state.sel=null;drawer.classList.remove('open');document.body.classList.remove('drawer-open');setTimeout(render,380);drawer.setAttribute('aria-hidden','true');render();}
+stage.addEventListener('click',e=>{const b=e.target.closest('.item');if(b)openItem(b.dataset.id);});
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{const f=b.dataset.f;state.on=new Set(f==='all'?['P','S','T']:[f]);render();});
+document.getElementById('connBtn').onclick=()=>{state.conn=!state.conn;if(state.conn)state.on=new Set(['P','S','T']);closeItem();};
+let wakeT;const setMain=on=>{if(on){document.body.classList.add('waking');clearTimeout(wakeT);wakeT=setTimeout(()=>document.body.classList.remove('waking'),1600);}document.body.classList.toggle('grey',!on);document.getElementById('mainSwitch').setAttribute('aria-pressed',on);document.getElementById('mainLabel').textContent=on?'Colour on':'Colour off';if(!on)closeItem();else requestAnimationFrame(render);};
+document.getElementById('mainSwitch').onclick=()=>setMain(document.body.classList.contains('grey'));
+document.getElementById('ctaOn').onclick=()=>setMain(true);
+// theme
+const root=document.documentElement;
+const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+const paintThemeIcon=()=>document.getElementById('themeIcon').innerHTML=isDark()?IC.sun:IC.moon;
+try{const t=localStorage.getItem('cvd-theme');if(t)root.dataset.theme=t;}catch(e){}
+document.getElementById('themeBtn').onclick=()=>{root.dataset.theme=isDark()?'light':'dark';try{localStorage.setItem('cvd-theme',root.dataset.theme);}catch(e){}paintThemeIcon();render();};
+paintThemeIcon();
+addEventListener('resize',()=>render());
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeItem();});
+document.fonts&&document.fonts.ready.then(render);render();
+</script>
