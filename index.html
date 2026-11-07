@@ -147,24 +147,24 @@ body.grey .gcontent{transform:none}
 body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:none}
 .greyview .glamp{position:relative;margin:70px auto 0;--c:var(--grey)}
 .greyview .glamp .lamp{position:relative;left:50%;top:0;cursor:default}
-.greyview .glamp .lamp::before{content:"";position:absolute;left:50%;bottom:calc(100% + 6px);width:4px;height:120px;transform:translateX(-50%);background:var(--rail);border-radius:2px}
+.greyview .glamp .lamp::before{content:"";position:absolute;left:50%;bottom:calc(100% + 7px);width:4px;height:64px;transform:translateX(-50%);background:var(--rail);border-radius:2px}
 .greyview .glamp .lens{background:#fff;box-shadow:0 0 18px 6px #fff,0 0 40px 14px var(--grey)}
 .greyview .gcone{position:absolute;left:50%;top:120px;width:min(1000px,96vw);height:820px;background:linear-gradient(180deg,color-mix(in srgb,var(--grey) 40%,transparent),transparent 85%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);filter:blur(12px);pointer-events:none}
 .gcontent{position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:40px}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--mu)}
 .gcontent h1{margin:0;font-size:clamp(30px,4.2vw,46px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance;max-width:16ch}
 .gcontent .lead{margin:0;color:var(--mu);font-size:15px;line-height:1.55;max-width:60ch}
-.viz{display:grid;grid-template-columns:repeat(3,minmax(0,300px));gap:40px;justify-content:center;margin-top:28px;text-align:left}
-.viz figure{margin:0;display:flex;flex-direction:column;gap:12px}
+.viz{display:grid;grid-template-columns:repeat(3,260px);gap:56px;justify-content:center;margin-top:32px;text-align:center}
+.viz figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:14px}
+.viz .box{width:240px;height:120px;display:grid;place-items:center}
 .viz .big{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1}
-.viz figcaption{font-size:13.5px;line-height:1.45;color:var(--mu)}
-.viz .grid{display:grid;gap:5px;min-height:96px;align-content:end}
+.viz figcaption{font-size:13.5px;line-height:1.45;color:var(--mu);max-width:240px}
+.viz .grid{display:grid;width:240px;gap:4px}
 .viz .grid i{display:block;aspect-ratio:1;border-radius:50%;background:color-mix(in srgb,var(--tx) 14%,transparent)}
 .viz .grid i.on{background:var(--tx)}
-.viz .g12{grid-template-columns:repeat(6,1fr);max-width:200px}
-.viz .g200{grid-template-columns:repeat(20,1fr);gap:3px}
-.viz .g100{grid-template-columns:repeat(10,1fr);gap:4px;max-width:190px}
-.viz .g100 i{border-radius:3px}
+.viz .g12{grid-template-columns:repeat(6,1fr);gap:8px;width:220px}
+.viz .g200,.viz .g100{grid-template-columns:repeat(20,1fr)}
+.viz .g100 i{border-radius:2px}
 .viz .src{font-size:11px;color:var(--mu);opacity:.8}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,280px));gap:18px;justify-content:center;margin-top:20px;text-align:left}
 .card{background:color-mix(in srgb,var(--surf) 94%,transparent);border:1px solid var(--bd);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px}
@@ -286,7 +286,7 @@ const count={};ADJ.forEach(([a,b])=>{count[a]=(count[a]||0)+1;count[b]=(count[b]
 document.getElementById('rods').innerHTML=Object.values(GROUPS).map(g=>{const x=g.x*10,ry=190-180*g.x/100;return `<line x1="${x}" y1="${ry}" x2="${x}" y2="${g.top-8}" stroke-width="4"/>`}).join('');
 
 // colour-off data viz
-const dots=(n,on,cls)=>`<div class="grid ${cls}" aria-hidden="true">${Array.from({length:n},(_,i)=>`<i class="${i<on?'on':''}"></i>`).join('')}</div>`;
+const dots=(n,on,cls)=>`<div class="box"><div class="grid ${cls}" aria-hidden="true">${Array.from({length:n},(_,i)=>`<i class="${i<on?'on':''}"></i>`).join('')}</div></div>`;
 document.getElementById('viz').innerHTML=[
  ['1 in 12','men are colour blind worldwide',dots(12,1,'g12'),'Cleveland Clinic'],
  ['1 in 200','women are colour blind worldwide',dots(200,1,'g200'),'Cleveland Clinic'],
