@@ -126,7 +126,7 @@ body.conn .legend{display:flex}
 .scene{display:grid}
 .scene>.stage,.scene>.greyview{grid-area:1/1}
 .stage,.hint{transition:opacity .7s ease .35s,filter .9s ease .2s}
-.greyview{position:relative;min-height:860px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));padding-block:0 60px;text-align:center;
+.greyview{position:relative;overflow:hidden;min-height:860px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));padding-block:0 60px;text-align:center;
   opacity:0;visibility:hidden;pointer-events:none;transition:opacity .6s ease,visibility 0s linear .6s}
 body.grey .greyview{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .8s ease .7s,visibility 0s}
 body.grey .stage,body.grey .hint{opacity:0;filter:grayscale(1) brightness(.6);pointer-events:none;transition:opacity .6s ease .45s,filter .5s ease}
@@ -147,7 +147,7 @@ body.grey .gcontent{transform:none}
 body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:none}
 .greyview .glamp{position:relative;margin:70px auto 0;--c:var(--grey)}
 .greyview .glamp .lamp{position:relative;left:50%;top:0;cursor:default}
-.greyview .glamp .lamp::before{content:"";position:absolute;left:50%;bottom:calc(100% + 7px);width:4px;height:50px;transform:translateX(-50%);background:var(--rail);border-radius:2px}
+.greyview .glamp .lamp::before{content:"";position:absolute;left:50%;bottom:calc(100% + 7px);width:4px;height:100vh;transform:translateX(-50%);background:var(--rail);border-radius:2px}
 .greyview .glamp .lens{background:#fff;box-shadow:0 0 18px 6px #fff,0 0 40px 14px var(--grey)}
 .greyview .gcone{position:absolute;left:50%;top:120px;width:min(1000px,96vw);height:820px;background:linear-gradient(180deg,color-mix(in srgb,var(--grey) 40%,transparent),transparent 85%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);filter:blur(12px);pointer-events:none}
 .gcontent{position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:40px}
