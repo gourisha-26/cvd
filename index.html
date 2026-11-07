@@ -182,7 +182,7 @@ body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:non
 .fine{font-size:11px;color:var(--mu)}
 
 /* NARROW: stack the groups */
-@media (min-width:1001px){html,body{height:100%;overflow:hidden;overscroll-behavior:none}body.grey .hint{position:absolute;visibility:hidden}.greyview{min-height:0;height:calc(100dvh - 82px);padding-bottom:0;overflow:hidden}.greyview .glamp{margin-top:28px}.greyview .gcontent{margin-top:4px;gap:12px}.greyview .viz{margin-top:16px}.greyview .cta{margin-top:14px}body:not(.grey) .stage{--sh:max(560px,calc(100dvh - 150px));height:var(--sh)}}
+@media (min-width:1001px){html,body{height:100%;overflow:hidden;overscroll-behavior:none}body.grey .hint{position:absolute;visibility:hidden}.greyview{min-height:0;height:auto;padding-bottom:28px;overflow:hidden;transform-origin:top center}.stage{transform-origin:top center}.greyview .glamp{margin-top:28px}.greyview .gcontent{margin-top:4px;gap:12px}.greyview .viz{margin-top:16px}.greyview .cta{margin-top:14px}}
 @media (max-width:1000px){
   .stage{height:auto;margin-top:0;display:grid;gap:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
   .rail,.links,.legend{display:none!important}
@@ -296,6 +296,17 @@ document.getElementById('viz').innerHTML=[
  ['4 in 100','people in the world are colour blind, about 300 million in total',dots(100,4,'g100'),'Colour Blind Awareness']
 ].map(([b,c,g,src])=>`<figure>${g}<div class="big">${b}</div><figcaption>${c}<br><span class="src">Source: ${src}</span></figcaption></figure>`).join('');
 
+let FIT=1;
+function fitScreens(){
+ const gv=document.querySelector('.greyview');
+ stage.style.transform='';gv.style.transform='';FIT=1;
+ if(innerWidth<=1000)return;
+ const top=stage.getBoundingClientRect().top;
+ FIT=Math.min(1,(innerHeight-top-8)/stage.offsetHeight);
+ stage.style.transform=`scale(${FIT})`;
+ const g=Math.min(1,(innerHeight-gv.getBoundingClientRect().top)/gv.scrollHeight);
+ gv.style.transform=`scale(${g})`;
+}
 function render(){
  const rs=document.querySelector(".rail");if(stage.clientHeight)rs.setAttribute("viewBox",`0 0 1000 ${stage.clientHeight}`);
  document.querySelectorAll('.group').forEach(el=>el.classList.toggle('on',state.on.has(el.dataset.g)));
@@ -309,7 +320,7 @@ function render(){
 }
 function drawLinks(list){
  if(!list.length||matchMedia('(max-width:1000px)').matches){linksSvg.innerHTML='';return;}
- const sb=stage.getBoundingClientRect();const pt=(id,side)=>{const r=document.querySelector(`.item[data-id="${id}"]`).getBoundingClientRect();return [side==='r'?r.right-sb.left+6:r.left-sb.left-6,r.top-sb.top+r.height/2];};
+ const sb=stage.getBoundingClientRect();const pt=(id,side)=>{const r=document.querySelector(`.item[data-id="${id}"]`).getBoundingClientRect();return [((side==='r'?r.right+6:r.left-6)-sb.left)/FIT,(r.top+r.height/2-sb.top)/FIT];};
  const col=k=>getComputedStyle(document.documentElement).getPropertyValue({P:'--p',S:'--s',T:'--t'}[k]).trim();
  let defs='',paths='';list.forEach(([a,b],i)=>{const [x1,y1]=pt(a,'r'),[x2,y2]=pt(b,'l');const mx=(x1+x2)/2;
   defs+=`<linearGradient id="lg${i}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="0" x2="${x2}" y2="0"><stop offset="0" stop-color="${col(a[0])}"/><stop offset="1" stop-color="${col(b[0])}"/></linearGradient>`;
@@ -347,8 +358,8 @@ const paintThemeIcon=()=>document.getElementById('themeIcon').innerHTML=isDark()
 try{const t=localStorage.getItem('cvd-theme');if(t)root.dataset.theme=t;}catch(e){}
 document.getElementById('themeBtn').onclick=()=>{root.dataset.theme=isDark()?'light':'dark';try{localStorage.setItem('cvd-theme',root.dataset.theme);}catch(e){}paintThemeIcon();render();};
 paintThemeIcon();
-addEventListener('resize',()=>render());
+addEventListener('resize',()=>{fitScreens();render();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeItem();});
 document.body.classList.add('grey');
-document.fonts&&document.fonts.ready.then(render);render();
+fitScreens();document.fonts&&document.fonts.ready.then(()=>{fitScreens();render();});render();
 </script>
