@@ -278,6 +278,7 @@ document.getElementById('cards').innerHTML=CVD.map(([n,d,f,sim])=>`<article clas
  <small>THEY MAY SEE</small><div class="sw">${sim.map(c=>`<span style="background:${c}"></span>`).join('')}</div></article>`).join('');
 
 function render(){
+ const rs=document.querySelector(".rail");if(stage.clientHeight)rs.setAttribute("viewBox",`0 0 1000 ${stage.clientHeight}`);
  document.querySelectorAll('.group').forEach(el=>el.classList.toggle('on',state.on.has(el.dataset.g)));
  document.querySelectorAll('.seg button').forEach(b=>{const f=b.dataset.f;const on=f==='all'?state.on.size===3:state.on.has(f);b.classList.toggle('on',on);b.classList.toggle('active',f==='all'?state.on.size===3:(state.on.size===1&&state.on.has(f)));});
  document.body.classList.toggle('conn',state.conn);
