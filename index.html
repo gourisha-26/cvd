@@ -117,6 +117,20 @@ body.conn .legend{display:flex}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 10px;border-radius:20px;border:1px solid var(--bd);font-size:12px;font-weight:600}
 .chips .dot{background:var(--c)}
+/* CVD-safe variant: lightness-separated colours + shapes */
+#safeBtn .toggle{background:var(--lens-off)!important}#safeBtn .toggle::after{left:2px!important}body.safe #safeBtn .toggle{background:var(--switch)!important}body.safe #safeBtn .toggle::after{left:16px!important}
+body.safe{--p:#FFA978;--s:#3FB3A3;--t:#2E5FA8}
+:root[data-theme="dark"] body.safe{--t:#5B8FDA}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body.safe{--t:#5B8FDA}}
+.mark,.mk{display:none}
+body.safe .mark{display:block;position:absolute;left:50%;top:13px;width:20px;height:20px;transform:translateX(-50%);background:var(--c);box-shadow:0 0 0 2px #fff;z-index:2}
+body.safe .mk{display:inline-block;width:11px;height:11px;margin-right:8px;vertical-align:1px;background:var(--c)}
+.group.P .mark,.group.P .mk,body.safe .seg [data-f=P] .dot,body.safe .chips [data-s=P] .dot{border-radius:50%}
+.group.S .mark,.group.S .mk,body.safe .seg [data-f=S] .dot,body.safe .chips [data-s=S] .dot{border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%)}
+body.safe .group.S .mark{box-shadow:none;filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1px #fff)}
+.group.T .mark,.group.T .mk,body.safe .seg [data-f=T] .dot,body.safe .chips [data-s=T] .dot{border-radius:2px}
+body.safe .seg button .dot{width:10px;height:10px}
+
 .quote{padding:16px;border-radius:12px;background:var(--chip);font-size:15px;font-weight:600;line-height:1.4}
 .quote span{display:block;margin-top:8px;font-size:11.5px;color:var(--mu);font-weight:500}
 .addmore{padding:16px;border-radius:12px;border:1.2px dashed var(--bd);color:var(--mu);font-size:12px;font-weight:500}
@@ -211,6 +225,7 @@ body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:non
     </div>
   </div>
   <div class="right">
+    <button class="pill" id="safeBtn" aria-pressed="false" title="Switch to colour blind safe lights"><span class="toggle"></span>CVD-safe</button>
     <button class="pill" id="connBtn" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Connections</button>
     <button class="pill" id="themeBtn" aria-label="Switch light or dark mode"><svg class="icon" viewBox="0 0 24 24" id="themeIcon"></svg></button>
   </div>
@@ -278,8 +293,8 @@ const count={};ADJ.forEach(([a,b])=>{count[a]=(count[a]||0)+1;count[b]=(count[b]
 ['T','S','P'].forEach(k=>{const g=GROUPS[k];const el=document.createElement('div');el.className='group on '+k;el.dataset.g=k;
  el.style.cssText=`--x:${g.x}%;--top:${g.top}px;--c:${g.c}`;
  el.innerHTML=`<div class="pool"></div><div class="cone"></div>
- <button class="lamp" aria-label="Turn ${g.name} light on or off"><span class="cap"></span><span class="shade"></span><span class="rim"></span><span class="lens"></span></button>
- <div class="col"><div class="num">${g.n}</div><h2>${g.title.replace(' ','<br>')}</h2><div class="bar"></div>
+ <button class="lamp" aria-label="Turn ${g.name} light on or off"><span class="cap"></span><span class="shade"></span><span class="rim"></span><span class="lens"></span><span class="mark"></span></button>
+ <div class="col"><div class="num"><span class="mk"></span>${g.n}</div><h2>${g.title.replace(' ','<br>')}</h2><div class="bar"></div>
  <ul>${g.items.map((it,i)=>`<li><button class="item" data-id="${k}${i}"><span class="ic">${svg(it.icon)}</span>${it.name}<span class="badge">${count[k+i]||''}</span></button></li>`).join('')}</ul>
  <div class="foot">${g.foot}</div></div>`;
  stage.appendChild(el);
@@ -345,7 +360,7 @@ function openItem(id){
  <div class="who"><span class="ic" style="color:${g.c}">${svg(it.icon)}</span><div><h3>${it.name}</h3><p>${it.role}</p></div></div>
  <div class="dsec"><h4>WHO THEY ARE</h4><p>${it.who}</p></div>
  <div class="dsec"><h4>WHAT THEY DO OR FACE</h4><ul>${it.faces.map(f=>`<li>${f}</li>`).join('')}</ul></div>
- ${conns.length?`<div class="dsec"><h4>CONNECTED TO</h4><div class="chips">${conns.map(c=>`<button data-go="${c}" style="--c:${GROUPS[c[0]].c}"><span class="dot"></span>${item(c).name}</button>`).join('')}</div></div>`:''}
+ ${conns.length?`<div class="dsec"><h4>CONNECTED TO</h4><div class="chips">${conns.map(c=>`<button data-go="${c}" data-s="${c[0]}" style="--c:${GROUPS[c[0]].c}"><span class="dot"></span>${item(c).name}</button>`).join('')}</div></div>`:''}
  ${it.quote?`<div class="dsec"><h4>FROM MY RESEARCH</h4><div class="quote">&ldquo;${it.quote[0]}&rdquo;<span>${it.quote[1]}</span></div></div>`:''}
  <div class="addmore">+ More information about ${it.name.toLowerCase()} can be added here later</div>`;
  drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');document.body.classList.add('drawer-open');setTimeout(render,380);
@@ -371,5 +386,8 @@ paintThemeIcon();
 addEventListener('resize',()=>{fitScreens();render();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeItem();});
 document.body.classList.add('grey');
+const setSafe=on=>{document.body.classList.toggle('safe',on);document.getElementById('safeBtn').setAttribute('aria-pressed',on);try{localStorage.setItem('cvd-safe',on?'1':'0')}catch(e){};requestAnimationFrame(render)};
+document.getElementById('safeBtn').onclick=()=>setSafe(!document.body.classList.contains('safe'));
+try{if(localStorage.getItem('cvd-safe')==='1')setSafe(true)}catch(e){}
 fitScreens();document.fonts&&document.fonts.ready.then(()=>{fitScreens();render();});render();
 </script>
