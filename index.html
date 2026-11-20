@@ -349,12 +349,17 @@ function drawLinks(list){
  if(!list.length||matchMedia('(max-width:1000px)').matches){linksSvg.innerHTML='';return;}
  const sb=stage.getBoundingClientRect();const pt=(id,side)=>{const r=document.querySelector(`.item[data-id="${id}"]`).getBoundingClientRect();return [((side==='r'?r.right+6:r.left-6)-sb.left)/FIT,(r.top+r.height/2-sb.top)/FIT];};
  const col=k=>getComputedStyle(document.body).getPropertyValue({P:'--p',S:'--s',T:'--t'}[k]).trim();
- let defs='',paths='';list.forEach(([a,b],i)=>{const [x1,y1]=pt(a,'r'),[x2,y2]=pt(b,'l');const mx=(x1+x2)/2;
-  defs+=`<linearGradient id="lg${i}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="0" x2="${x2}" y2="0"><stop offset="0" stop-color="${col(a[0])}"/><stop offset="1" stop-color="${col(b[0])}"/></linearGradient>`;
+ let defs='',paths='';
+ const ends={};list.forEach(([a,b])=>{(ends[a+'r']=ends[a+'r']||[]).push(b);(ends[b+'l']=ends[b+'l']||[]).push(a);});
+ const off=(key,other)=>{const arr=ends[key];if(!arr||arr.length<2)return 0;const ys=arr.map(o=>document.querySelector(`.item[data-id="${o}"]`).getBoundingClientRect().top);const sorted=[...arr].sort((m,n)=>ys[arr.indexOf(m)]-ys[arr.indexOf(n)]);return (sorted.indexOf(other)-(arr.length-1)/2)*9;};
+ const head=(x,y,dir,c)=>`<path d="M${x} ${y}L${x-9*dir} ${y-5}L${x-9*dir} ${y+5}Z" fill="${c}"/>`;
+ list.forEach(([a,b],i)=>{let [x1,y1]=pt(a,'r'),[x2,y2]=pt(b,'l');y1+=off(a+'r',b);y2+=off(b+'l',a);
   const d=DIR[a+'>'+b]||1,ca=col(a[0]),cb=col(b[0]);
-  defs+=`<marker id="ae${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${cb}"/></marker><marker id="as${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${ca}"/></marker>`;
-  const ms=(d===-1||d===2)?`marker-start="url(#as${i})"`:'',me=(d===1||d===2)?`marker-end="url(#ae${i})"`:'';
-  paths+=`<path d="M${x1} ${y1}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="url(#lg${i})" stroke-width="2" fill="none" ${ms} ${me}/>${ms?'':`<circle cx="${x1}" cy="${y1}" r="4" fill="${ca}"/>`}${me?'':`<circle cx="${x2}" cy="${y2}" r="4" fill="${cb}"/>`}`;});
+  const sx=(d===-1||d===2)?x1+9:x1, ex=(d===1||d===2)?x2-9:x2, mx=(sx+ex)/2;
+  defs+=`<linearGradient id="lg${i}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="0" x2="${x2}" y2="0"><stop offset="0" stop-color="${ca}"/><stop offset="1" stop-color="${cb}"/></linearGradient>`;
+  paths+=`<path d="M${sx} ${y1}C${mx} ${y1} ${mx} ${y2} ${ex} ${y2}" stroke="url(#lg${i})" stroke-width="2" fill="none"/>`;
+  paths+=(d===-1||d===2)?head(x1,y1,-1,ca):`<circle cx="${x1}" cy="${y1}" r="3.5" fill="${ca}"/>`;
+  paths+=(d===1||d===2)?head(x2,y2,1,cb):`<circle cx="${x2}" cy="${y2}" r="3.5" fill="${cb}"/>`;});
  linksSvg.innerHTML=`<defs>${defs}</defs>${paths}`;
 }
 function openItem(id){
