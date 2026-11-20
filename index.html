@@ -239,7 +239,7 @@ body:not(.grey) .greyview .glamp .lens{background:var(--lens-off);box-shadow:non
   <div class="legend"><small>HOW TO READ</small>
     <div class="row"><i style="--a:var(--t);--b:var(--s);background:linear-gradient(90deg,var(--t),var(--s))"></i>Tertiary sets rules for Secondary</div>
     <div class="row"><i style="--a:var(--s);--b:var(--p);background:linear-gradient(90deg,var(--s),var(--p))"></i>Secondary makes games for Primary</div>
-    <div class="note">Numbers show how many links an item has</div>
+    <div class="note">Arrows show which way each link goes. Two arrowheads mean it goes both ways.</div>
   </div>
   <svg class="links" id="links"></svg>
 </main>
@@ -280,6 +280,8 @@ const GROUPS={
   {icon:'printer',name:'Manufacturers',role:'Print and produce',who:'Factories that print and produce game boards, cards and pieces.',faces:['Printing quality changes how distinct colours look','Cheaper inks and plastics can make similar colours even closer'],exists:['Shape-coded traffic lights in a few places','Raised or textured symbols for touch','Colour names on product labels'],insight:['Similar shades, like two reds or yellow and neon green, are among the hardest pairs to tell apart.','According to the user interview insights']}]}};
 /* Links between items (left group → right group). Adjacent groups only, plus one direct link for the player. */
 const LINKS=[['T0','S1'],['T1','S2'],['S1','P0'],['S3','P0'],['S2','P1']];
+/* direction: 1 = left to right, -1 = right to left, 2 = both ways */
+const DIR={'T0>S1':1,'T1>S2':2,'S1>P0':2,'S3>P0':2,'S2>P1':1};
 const ADJ=LINKS.filter(([a,b])=>!(a[0]==='T'&&b[0]==='P'));
 const CVD=[['Protanopia','Red looks dark and muddy','Common',['#8A7E3C','#A39448','#3F5DB5','#E8D45E']],['Deuteranopia','Green and red look alike','The most common type',['#9C8A3E','#A08E46','#4060B8','#EBD660']],['Tritanopia','Blue and yellow get confused','Rare',['#E8434E','#3D9C9A','#2E7D86','#F2A3B0']],['Achromatopsia','No colour at all, only grey','Very rare',['#6B6B6B','#828282','#5A5A5A','#C4C4C4']]];
 const NORMAL=['#E53935','#2E9E4F','#1E63D6','#F7C325'];
@@ -346,10 +348,13 @@ function render(){
 function drawLinks(list){
  if(!list.length||matchMedia('(max-width:1000px)').matches){linksSvg.innerHTML='';return;}
  const sb=stage.getBoundingClientRect();const pt=(id,side)=>{const r=document.querySelector(`.item[data-id="${id}"]`).getBoundingClientRect();return [((side==='r'?r.right+6:r.left-6)-sb.left)/FIT,(r.top+r.height/2-sb.top)/FIT];};
- const col=k=>getComputedStyle(document.documentElement).getPropertyValue({P:'--p',S:'--s',T:'--t'}[k]).trim();
+ const col=k=>getComputedStyle(document.body).getPropertyValue({P:'--p',S:'--s',T:'--t'}[k]).trim();
  let defs='',paths='';list.forEach(([a,b],i)=>{const [x1,y1]=pt(a,'r'),[x2,y2]=pt(b,'l');const mx=(x1+x2)/2;
   defs+=`<linearGradient id="lg${i}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="0" x2="${x2}" y2="0"><stop offset="0" stop-color="${col(a[0])}"/><stop offset="1" stop-color="${col(b[0])}"/></linearGradient>`;
-  paths+=`<path d="M${x1} ${y1}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="url(#lg${i})" stroke-width="2" fill="none"/><circle cx="${x1}" cy="${y1}" r="4" fill="${col(a[0])}"/><circle cx="${x2}" cy="${y2}" r="4" fill="${col(b[0])}"/>`;});
+  const d=DIR[a+'>'+b]||1,ca=col(a[0]),cb=col(b[0]);
+  defs+=`<marker id="ae${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${cb}"/></marker><marker id="as${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${ca}"/></marker>`;
+  const ms=(d===-1||d===2)?`marker-start="url(#as${i})"`:'',me=(d===1||d===2)?`marker-end="url(#ae${i})"`:'';
+  paths+=`<path d="M${x1} ${y1}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="url(#lg${i})" stroke-width="2" fill="none" ${ms} ${me}/>${ms?'':`<circle cx="${x1}" cy="${y1}" r="4" fill="${ca}"/>`}${me?'':`<circle cx="${x2}" cy="${y2}" r="4" fill="${cb}"/>`}`;});
  linksSvg.innerHTML=`<defs>${defs}</defs>${paths}`;
 }
 function openItem(id){
