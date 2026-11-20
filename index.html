@@ -279,9 +279,9 @@ const GROUPS={
   {icon:'phone',name:'Digital apps',role:'Online versions',who:'Online and mobile versions of board games, such as Ludo apps.',faces:['Can add colour blind modes or symbols with a simple update','Modes are often hidden in settings or change the look too much'],exists:['Colour blind modes in many video games','Symbols or numbers shown on game pieces in some apps'],insight:['Players either did not know colour blind modes existed, or found they made colours look dull.','According to the user interview insights']},
   {icon:'printer',name:'Manufacturers',role:'Print and produce',who:'Factories that print and produce game boards, cards and pieces.',faces:['Printing quality changes how distinct colours look','Cheaper inks and plastics can make similar colours even closer'],exists:['Shape-coded traffic lights in a few places','Raised or textured symbols for touch','Colour names on product labels'],insight:['Similar shades, like two reds or yellow and neon green, are among the hardest pairs to tell apart.','According to the user interview insights']}]}};
 /* Links between items (left group → right group). Adjacent groups only, plus one direct link for the player. */
-const LINKS=[['T0','S1'],['T1','S2'],['S1','P0'],['S3','P0'],['S2','P1']];
+const LINKS=[['T0','S1'],['T1','S2'],['S1','P0'],['S3','P0'],['S2','P1'],['S0','S1'],['S0','S2']];
 /* direction: 1 = left to right, -1 = right to left, 2 = both ways */
-const DIR={'T0>S1':1,'T1>S2':2,'S1>P0':2,'S3>P0':2,'S2>P1':1};
+const DIR={'S0>S1':1,'S0>S2':1,'T0>S1':1,'T1>S2':2,'S1>P0':2,'S3>P0':2,'S2>P1':1};
 const ADJ=LINKS.filter(([a,b])=>!(a[0]==='T'&&b[0]==='P'));
 const CVD=[['Protanopia','Red looks dark and muddy','Common',['#8A7E3C','#A39448','#3F5DB5','#E8D45E']],['Deuteranopia','Green and red look alike','The most common type',['#9C8A3E','#A08E46','#4060B8','#EBD660']],['Tritanopia','Blue and yellow get confused','Rare',['#E8434E','#3D9C9A','#2E7D86','#F2A3B0']],['Achromatopsia','No colour at all, only grey','Very rare',['#6B6B6B','#828282','#5A5A5A','#C4C4C4']]];
 const NORMAL=['#E53935','#2E9E4F','#1E63D6','#F7C325'];
@@ -353,7 +353,8 @@ function drawLinks(list){
  const ends={};list.forEach(([a,b])=>{(ends[a+'r']=ends[a+'r']||[]).push(b);(ends[b+'l']=ends[b+'l']||[]).push(a);});
  const off=(key,other)=>{const arr=ends[key];if(!arr||arr.length<2)return 0;const ys=arr.map(o=>document.querySelector(`.item[data-id="${o}"]`).getBoundingClientRect().top);const sorted=[...arr].sort((m,n)=>ys[arr.indexOf(m)]-ys[arr.indexOf(n)]);return (sorted.indexOf(other)-(arr.length-1)/2)*9;};
  const head=(x,y,dir,c)=>`<path d="M${x} ${y}L${x-9*dir} ${y-5}L${x-9*dir} ${y+5}Z" fill="${c}"/>`;
- list.forEach(([a,b],i)=>{let [x1,y1]=pt(a,'r'),[x2,y2]=pt(b,'l');y1+=off(a+'r',b);y2+=off(b+'l',a);
+ list.forEach(([a,b],i)=>{if(a[0]===b[0]){const [xa,ya0]=pt(a,'l'),[xb,yb0]=pt(b,'l'),ya=ya0+7,yb=yb0+7,c=col(a[0]),bx=Math.min(xa,xb)-30-Math.abs(yb-ya)*.12;paths+=`<path d="M${xa} ${ya}C${bx} ${ya} ${bx} ${yb} ${xb-9} ${yb}" stroke="${c}" stroke-width="2" fill="none" stroke-dasharray="4 3"/><circle cx="${xa}" cy="${ya}" r="3.5" fill="${c}"/>`+head(xb,yb,1,c);return;}
+  let [x1,y1]=pt(a,'r'),[x2,y2]=pt(b,'l');y1+=off(a+'r',b);y2+=off(b+'l',a);
   const d=DIR[a+'>'+b]||1,ca=col(a[0]),cb=col(b[0]);
   const sx=(d===-1||d===2)?x1+9:x1, ex=(d===1||d===2)?x2-9:x2, mx=(sx+ex)/2;
   defs+=`<linearGradient id="lg${i}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="0" x2="${x2}" y2="0"><stop offset="0" stop-color="${ca}"/><stop offset="1" stop-color="${cb}"/></linearGradient>`;
